@@ -4,8 +4,8 @@ class ItemStorage:
     def __init__(self, file_path, value=None):
         self.file_path = f"{file_path}.csv"
         self.fieldnames = ['Rang', 'Nom_de_l_entreprise', 'url_de_l_entreprise', 'phones','emails', 'addresses', 'linkedin', 'founder_profile',
-        'founder_profile_url', 'profiles', 'Taux_de_croissance_Annuel_moyen', 'Taux_de_croissance_2019_2022',
-        'Chiffre_d_affaires_2022', 'Chiffre_d_affaires_2019', 'Salariés_2022',
+        'profile_description', 'valid_profile_description', 'founder_profile_url', 'profiles', 'Taux_de_croissance_Annuel_moyen', 
+        'Taux_de_croissance_2019_2022', 'Chiffre_d_affaires_2022', 'Chiffre_d_affaires_2019', 'Salariés_2022',
         'Salariés_2019', 'Salariés_Créations_de_postes_en_2024', 'Total_2024',
         'Secteur', 'Région']
         
@@ -32,6 +32,8 @@ class ItemStorage:
             'addresses' : item.addresses,
             'linkedin' : item.linkedin,
             'founder_profile' : item.founder_profile,
+            'profile_description' : item.profile_description,
+            'valid_profile_description' : item.valid_profile_description,
             'founder_profile_url' : item.founder_profile_url,
             'profiles' : item.profiles,
             'Taux_de_croissance_Annuel_moyen' : item.Taux_de_croissance_Annuel_moyen, 
@@ -64,10 +66,10 @@ class ItemStorage:
 
 
 class ExceptionStorage:
-    def __init__(self, item, error ,file_path='results/exceptions_2'):
+    def __init__(self, item, error ,file_path='results/exceptions_3'):
         self.file_path = f"{file_path}.csv"
         self.fieldnames = ['Rang', 'Nom_de_l_entreprise', 'url_de_l_entreprise', 'phones','emails', 'addresses', 'linkedin', 'founder_profile', 
-        'founder_profile_url', 'profiles',
+        'profile_description', 'valid_profile_description', 'founder_profile_url', 'profiles',
         'Taux_de_croissance_Annuel_moyen', 'Taux_de_croissance_2019_2022', 'Chiffre_d_affaires_2022', 
         'Chiffre_d_affaires_2019', 'Salariés_2022', 'Salariés_2019', 'Salariés_Créations_de_postes_en_2024', 'Total_2024', 'Secteur', 'Région', 'error']
         
@@ -91,6 +93,8 @@ class ExceptionStorage:
             'addresses' : item.addresses,
             'linkedin' : item.linkedin,
             'founder_profile' : item.founder_profile,
+            'profile_description' : item.profile_description,
+            'valid_profile_description' : item.valid_profile_description,
             'founder_profile_url' : item.founder_profile_url,
             'profiles' : item.profiles,
             'Taux_de_croissance_Annuel_moyen' : item.Taux_de_croissance_Annuel_moyen, 

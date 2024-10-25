@@ -16,7 +16,7 @@ from ItemStorage import ExceptionStorage
 class ItemScraping:
     
     def __init__(self, url=None, proxy=None, with_selenium_grid=True, file_path=None, item=None, contact_link_classifier=None, contactOpenAIScraping=None, 
-                 pageProcessing=None, sentenceProcessing= None, foundersOpenAIClassification=None, lock_print=None):
+                 pageProcessing=None, sentenceProcessing= None, foundersOpenAIClassification=None, filterFoundersOneByOneOpenAI=None, lock_print=None):
         self.url = url
         self.file_path = file_path
         self.item = item
@@ -46,6 +46,7 @@ class ItemScraping:
         self.pageProcessing = pageProcessing
         self.sentenceProcessing = sentenceProcessing
         self.foundersOpenAIClassification = foundersOpenAIClassification
+        self.filterFoundersOneByOneOpenAI = filterFoundersOneByOneOpenAI
         
         # self.start_scraping()
         
@@ -129,27 +130,6 @@ class ItemScraping:
                 check = 0
             i += 1
             
-    def get_element(self, path_to_elem, group=False, from_elem=None):
-        i = 0
-        while i<5:
-            try:
-                if not from_elem:
-                    if not group:
-                        elem = self.driver.find_element(By.XPATH, path_to_elem)
-                    else :
-                        elem = self.driver.find_elements(By.XPATH, path_to_elem)
-                    return {"status": True, "data":elem }
-                else:
-                    if not group:
-                        elem = from_elem.find_element(By.XPATH, path_to_elem)
-                    else :
-                        elem = from_elem.find_elements(By.XPATH, path_to_elem)
-                    return {"status": True, "data":elem }
-                        
-            except Exception as e:
-                i += 1
-                if i == 5:
-                    return {"status": False, "data":str(e) }
 
     def get_all_contact_page_links(self):
         try:
@@ -276,6 +256,7 @@ class ItemScraping:
         # print(results)
         return results
 
+    ############################################################################################################
     def get_google_page(self):
         self.driver.get('https://www.google.com')
         time.sleep(random.uniform(0.5, 2))
@@ -320,6 +301,7 @@ class ItemScraping:
             ExceptionStorage(self.item, str(e))
             return {"status": False, "data": self.item }
 
+    ########################################################################################################
     def get_linkedin_authentication(self):
         email = 'abdelghaffourmh@gmail.com'
         pwd = 'abdo12345'
@@ -444,6 +426,7 @@ class ItemScraping:
             
         return {"status": True, "data": personne_dic }
 
+    ########################################################################################################
     def get_Founder_Profiles_using_OpenAi(self, item):        
         self.item = item
 
@@ -534,3 +517,51 @@ class ItemScraping:
             print(e.args[0])
             ExceptionStorage(self.item, str(e))
             return {"status": False, "data": self.item }
+
+
+    def is_founder_director(self, description):
+        keywords = [
+            "general director", "directeur général", "directrice générale",
+            "director", "directeur", "directrice",
+            "CEO", "PDG",
+            "president", "président", "présidente",
+            "founder", "fondateur", "fondatrice",
+            "co-founder", "Co-fondatrice", "Co-fondateur",
+            "CTO",
+            "Chief", "chef",
+            "HR director", "DRH", "directeur RH", "directrice RH",
+            "partner", "associé", "associée",
+            "owner",
+            "Investor", "investeur", "Entrepreneur"
+        ]
+    
+        # Exclude "product owner" explicitly
+        if "product owner" in str(description).lower():
+            return {"response": False}
+    
+        # Check if any keyword is in the description
+        for keyword in keywords:
+            if keyword.lower() in str(description).lower():
+                return {"response": True}
+        
+        return {"response": False}
+
+
+    def filter_Founder_Profiles_using_OpenAi(self, item):        
+        self.item = item
+
+        result = self.is_founder_director(self.item.profile_description)
+        if result["response"]:
+            self.item.valid_profile_description = True
+            print(f'+'*150)
+            print(f'{self.item.profile_description} : {result["response"]}')
+            print(f'+'*150)
+        else:
+            result = self.filterFoundersOneByOneOpenAI.predict(self.item.profile_description)
+            print(f'-'*150)
+            print(f'{self.item.profile_description} : {result['content']}')
+            print(f'-'*150)
+            self.item.valid_profile_description = result['content']['response']
+        
+        return {"status": True, "data": self.item }
+        

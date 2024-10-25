@@ -116,3 +116,70 @@ The output format should be in JSON, where each key represents the profile's nam
         results['total_tokens'] = ai_msg.response_metadata['token_usage']['total_tokens']
         results['model_name'] = ai_msg.response_metadata['model_name']
         return results
+
+
+class FilterFoundersOneByOneOpenAI:
+
+    def __init__(self):
+        self.api_key = ''
+        self.llm = ChatOpenAI(
+            model="gpt-3.5-turbo-1106",
+            temperature=.3,
+            max_tokens=None,
+            timeout=None,
+            max_retries=3,
+            api_key = self.api_key,
+        )
+        messages = [
+            (
+                "system", """
+                Your task is to classify a single LinkedIn profile description as either "founder_director" (True) or "non-founder_director" (False). A profile should be classified as "founder_director" (True) if the job title matches one of the following:
+                
+"general director" ("directeur général" or "directrice générale")
+"CEO" ("PDG")
+"president" ("président" or "présidente")
+"founder" ("fondateur" or "fondatrice")
+"co-founder"
+"CTO"
+"Chief" ("chef")
+"HR director" ("DRH" - "directeur RH" or "directrice RH")
+"partner" ("associé" or "associée")
+"owner" (but not "product owner")
+"Investor" ("investeur")
+"Entrepreneur"
+If the profile's job title contains any of these roles, it should be classified as "founder_director" with a json response of {{"response": true}}. All other profiles should be classified as "non-founder_director" with a json response of {{"response": false}}. Treat titles like "director" and "directress" as equivalent."""
+            ),
+            (
+                "human", "CEO of a tech company"
+            ),
+            (
+                "ai", """{{"response": true}}"""
+            ),
+            (
+                "human", "charge des ressources humaines"
+            ),
+            (
+                "ai", """{{"response": false}}"""
+            ),
+            (
+                "system","""Make sure the output is well-structured and follows the given criteria, treating titles like "director" and "directress" (and their equivalents for other positions) as equivalent.
+                """
+            ),
+            (
+                "human","{profile}"
+            )
+            ]
+        
+        self.json_llm = self.llm.bind(response_format={"type": "json_object"})
+        self.template = ChatPromptTemplate.from_messages(messages)
+        self.chain = self.template | self.json_llm
+        
+    def predict(self, profile):
+        ai_msg = self.chain.invoke({'profile':profile})
+        results = {}
+        results['content'] = json.loads(ai_msg.content)
+        results['completion_tokens'] = ai_msg.response_metadata['token_usage']['completion_tokens']
+        results['prompt_tokens'] = ai_msg.response_metadata['token_usage']['prompt_tokens']
+        results['total_tokens'] = ai_msg.response_metadata['token_usage']['total_tokens']
+        results['model_name'] = ai_msg.response_metadata['model_name']
+        return results

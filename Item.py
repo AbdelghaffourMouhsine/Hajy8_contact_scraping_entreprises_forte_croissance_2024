@@ -8,6 +8,8 @@ class Item:
         self.addresses = None
         self.linkedin = None
         self.founder_profile = None
+        self.profile_description = None
+        self.valid_profile_description = None
         self.founder_profile_url = None
         self.profiles = None
         self.Taux_de_croissance_Annuel_moyen = None
@@ -30,6 +32,8 @@ class Item:
         self.addresses = dic.get('addresses')
         self.linkedin = dic.get('linkedin')
         self.founder_profile = dic.get('founder_profile')
+        self.profile_description = dic.get('profile_description')
+        self.valid_profile_description = dic.get('valid_profile_description')
         self.founder_profile_url = dic.get('founder_profile_url')
         self.profiles = dic.get('profiles')
         self.Taux_de_croissance_Annuel_moyen = dic.get('Taux_de_croissance_Annuel_moyen')
