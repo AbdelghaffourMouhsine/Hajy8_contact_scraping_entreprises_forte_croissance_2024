@@ -444,22 +444,8 @@ class ItemScraping:
                 if item.profiles.strip() != '[]':
                     profiles = []
                     for i, profile in enumerate('}&&||&&'.join(item.profiles[1:-1].split('},')).split('&&||&&')):
-                        profile = profile.replace('"', "'")
                         
-                        profile = profile.replace("{'", '{"')
-                        
-                        profile = profile.replace("', '", '", "')
-                        profile = profile.replace("\", '", '", "')
-                        profile = profile.replace("', \"", '", "')
-                        
-                        profile = profile.replace("': '", '": "')
-                        profile = profile.replace("': \"", '": "')
-                        profile = profile.replace("\": '", '": "')
-                        
-                        profile = profile.replace("'}", '"}')
-    
-                        profile = profile.replace("'", "\'")
-                        profile = profile.replace("\\'", "\'")
+                        profile = self.process_str_to_json(profile)
                         
                         profile = clean_invalid_escapes(profile)
                         
@@ -547,6 +533,25 @@ class ItemScraping:
         return {"response": False}
 
 
+    def process_str_to_json(str):
+        str = str.replace('"', "'")
+                        
+        str = str.replace("{'", '{"')
+        
+        str = str.replace("', '", '", "')
+        str = str.replace("\", '", '", "')
+        str = str.replace("', \"", '", "')
+        
+        str = str.replace("': '", '": "')
+        str = str.replace("': \"", '": "')
+        str = str.replace("\": '", '": "')
+        
+        str = str.replace("'}", '"}')
+
+        str = str.replace("'", "\'")
+        str = str.replace("\\'", "\'")
+        return str
+        
     def filter_Founder_Profiles_using_OpenAi(self, item):        
         self.item = item
 
